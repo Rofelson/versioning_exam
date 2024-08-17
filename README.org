@@ -1,0 +1,60 @@
+#+title: Readme
+
+* Examen Outils de Versioning
+** Exercice 1
+Simple script permettant de créer un répertoire github et 2 tickets. Il demande à l'exécution un token d'authentification et le nom d'utilisateur pour ne pas les exposer dans le répertoire.
+Installer requirements.txt avant, après avoir créé et activé un [[docs.python.org/3/library/venv.html][environnement virtuel]].
+#+begin_src shell
+pip install requirements.txt
+#+end_src
+
+Pour mes linux users, vous devez rendre le fichier exécutable d'abord, et ensuite exécuter avec python3.
+#+begin_src
+chmod +x github_repo.py # add execution permission to the file
+python3 ./github_repo.py
+#+end_src
+** Exercice 2
+Fichier yaml créé dans le répertoire =.github/workflows=. Installe par défaut black et ruff s'il n'y a pas de fichier =requirements.txt= à installer.
+Petite commande pour générer un tel fichier à partir de l'état de votre [[docs.python.org/3/library/venv.html][environnement virtuel]]... Parce que vous en utilisez un j'en suis sûr.
+#+begin_src shell
+pip freeze > requirements.txt
+#+end_src
+** Exercice 3 : Git worktrees
+*** Pourquoi ?
+Les *git worktrees* permettent de travailler plus aisément sur plusieurs branches de son répertoire sans avoir à le cloner plusieurs fois (gain d'espace et de temps de maintenance), ni multiplier les =git checkout= / =git switch= qui peuvent mener à des erreurs si vous n'êtes pas attentifs.
+Vous aurez vos branches dans des dossiers différents de votre répertoire de travail principal, mais qui dépendront tous de lui.
+*** Comment ?
+La création est tout ce qu'il y a de plus simple, pour une branche feature-branch par exempple
+#+begin_src shell
+git worktree add ../feature-branch feature-branch
+# Le premier est le dossier de création
+# Le second est le nom de la branche à cloner
+#+end_src
+Il suffira de se rendre dans le dossier et toutes les commandes classiques git comme =git status=, =git add=, =git branch= etc marcheront.
+Vous pouvez lister les worktree existants avec =git worktree list= et en supprimer un avec
+#+begin_src shell
+git worktree remove ../feature-branch
+#+end_src
+*** Exemple
+*Scénario* : Vous travaillez sur deux branches : master et feature1 mais pendant le développement de la nouvelle fonctionnalité, on demande un fix urgent sur main. Pas besoin de tout arrêter et checkout, vous décidez de créez un worktree.
+#+begin_src shell
+# Créez le worktree
+git worktree add ../master-fix master
+
+# Allez dans le dossier master-fix qui contient la branch master
+cd ../master-fix
+###
+# LE TRAVAIL DE CORRECTION
+###
+
+# Appliquez les modifications
+git commit -am "Hotfix master branch"
+
+# Retour à feature1
+cd ../feature1
+###
+# LE TRAVAIL PEUT CONTINUER... SI VOUS ETES RESTÉS DANS LE MEME TERMINAL
+###
+#+end_src
+*** Conclusion
+Plus besoin de s'emmêler les pinceaux entre plusieurs checkout et dépendre d'une barre d'outil ou de statut pour savoir dans quelle branche on travaille.
